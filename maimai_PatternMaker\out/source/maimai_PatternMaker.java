@@ -1,4 +1,22 @@
-import processing.sound.*;
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import processing.sound.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class maimai_PatternMaker extends PApplet {
+
+
 SoundFile song;
 String songName = "echo";
 
@@ -23,17 +41,17 @@ float tapOutterR;
 float tapInnerR;
 int tapSize = 20;
 
-color bgColor = #5C5D5D;
-color ringColor = #FBFF39;
-color tapColor = #FA5BB3;
+int bgColor = 0xff5C5D5D;
+int ringColor = 0xffFBFF39;
+int tapColor = 0xffFA5BB3;
 
-float displayTimeRate = 0.05;
+float displayTimeRate = 0.05f;
 
 boolean recording = false;
 long recordingStartTime;
 
-void setup() {
-  fullScreen();
+public void setup() {
+  
   //size(1200,800);
   orientation(LANDSCAPE);
   noStroke();
@@ -54,31 +72,31 @@ void setup() {
   initHitPoints();
 }
 
-void draw() {
+public void draw() {
   background(bgColor);
   drawMainRing();
   displayAll();
 
   if (recording) {
-    fill(#1FFF49);
+    fill(0xff1FFF49);
   } else {
-    fill(#FC3B4B);
+    fill(0xffFC3B4B);
   }
   rect(10, 10, 20, 20);
 }
 
-void initSizeValue() {
+public void initSizeValue() {
   centreX = displayWidth/2;
   centreY = displayHeight/2;
 
   mainRingOutterR = min(displayWidth /20 *10, displayWidth /20 *10) /2;
   mainRingInnerR = mainRingOutterR - ringSize;
 
-  tapOutterR = min(displayWidth /20 *1.5, displayWidth /20 *1.5) /2;
+  tapOutterR = min(displayWidth /20 *1.5f, displayWidth /20 *1.5f) /2;
   tapInnerR = tapOutterR - tapSize;
 }
 
-void initAllShape() {
+public void initAllShape() {
   tapOutter = createShape(ELLIPSE, 0, 0, tapOutterR*2, tapOutterR*2);
   tapOutter.setFill(tapColor);
   tapInner = createShape(ELLIPSE, 0, 0, tapInnerR*2, tapInnerR*2);
@@ -88,7 +106,7 @@ void initAllShape() {
   psTap.setFill(tapColor);
 }
 
-void initHitPoints() {
+public void initHitPoints() {
   for (byte i = 1; i<=8; i++) {
     float x, y;
     float alpha = 0;
@@ -99,13 +117,13 @@ void initHitPoints() {
     case 4:
     case 5:
     case 8:
-      alpha = 22.5;
+      alpha = 22.5f;
       break;
     case 2:
     case 3:
     case 6:
     case 7:
-      alpha = 67.5;
+      alpha = 67.5f;
       break;
     }
     switch(i) {    
@@ -129,7 +147,7 @@ void initHitPoints() {
   }
 }
 
-void drawMainRing() {
+public void drawMainRing() {
   fill(ringColor);
   ellipse(displayWidth/2, displayHeight/2, mainRingOutterR * 2, mainRingOutterR * 2);
   fill(bgColor);
@@ -159,7 +177,7 @@ class Tap {
     displayTime = tdp;
   }
 
-  void display() {
+  public void display() {
     //shape(psTap, x, y);
     if (displayTime > 0) {
       shape(tapOutter, x, y);
@@ -170,13 +188,13 @@ class Tap {
 }
 
 
-void displayAll() {
+public void displayAll() {
   for (Tap temp : taps) {
     temp.display();
   }
 }
 
-void keyPressed() {
+public void keyPressed() {
   if (key == ' ') {
     recording = !recording;
     if (recording) {
@@ -189,38 +207,48 @@ void keyPressed() {
       output.close();
     }
   } else if (key == '9') {
-    Tap temp = new Tap(hitPoints.get(0).x, hitPoints.get(0).y, tapDefSpeed, byte(1), 0.5);
+    Tap temp = new Tap(hitPoints.get(0).x, hitPoints.get(0).y, tapDefSpeed, PApplet.parseByte(1), 0.5f);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "1");
   } else if (key == '+') {
-    Tap temp = new Tap(hitPoints.get(1).x, hitPoints.get(1).y, tapDefSpeed, byte(2), 0.5);
+    Tap temp = new Tap(hitPoints.get(1).x, hitPoints.get(1).y, tapDefSpeed, PApplet.parseByte(2), 0.5f);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "2");
   } else if (key == ENTER) {
-    Tap temp = new Tap(hitPoints.get(2).x, hitPoints.get(2).y, tapDefSpeed, byte(3), 0.5);
+    Tap temp = new Tap(hitPoints.get(2).x, hitPoints.get(2).y, tapDefSpeed, PApplet.parseByte(3), 0.5f);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "3");
   } else if (key == '.') {
-    Tap temp = new Tap(hitPoints.get(3).x, hitPoints.get(3).y, tapDefSpeed, byte(4), 0.5);
+    Tap temp = new Tap(hitPoints.get(3).x, hitPoints.get(3).y, tapDefSpeed, PApplet.parseByte(4), 0.5f);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "4");
   } else if (key == '0') {
-    Tap temp = new Tap(hitPoints.get(4).x, hitPoints.get(4).y, tapDefSpeed, byte(5), 0.5);
+    Tap temp = new Tap(hitPoints.get(4).x, hitPoints.get(4).y, tapDefSpeed, PApplet.parseByte(5), 0.5f);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "5");
   } else if (key == '1') {
-    Tap temp = new Tap(hitPoints.get(5).x, hitPoints.get(5).y, tapDefSpeed, byte(6), 0.5);
+    Tap temp = new Tap(hitPoints.get(5).x, hitPoints.get(5).y, tapDefSpeed, PApplet.parseByte(6), 0.5f);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "6");
   } else if (key == '4') {
-    Tap temp = new Tap(hitPoints.get(6).x, hitPoints.get(1).y, tapDefSpeed, byte(7), 0.5);
+    Tap temp = new Tap(hitPoints.get(6).x, hitPoints.get(1).y, tapDefSpeed, PApplet.parseByte(7), 0.5f);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "7");
   } else if (key == '8') {
-    Tap temp = new Tap(hitPoints.get(7).x, hitPoints.get(7).y, tapDefSpeed, byte(8), 0.5);
+    Tap temp = new Tap(hitPoints.get(7).x, hitPoints.get(7).y, tapDefSpeed, PApplet.parseByte(8), 0.5f);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "8");
   } else if (key == 'x' || key == 'X') {
     exit();
+  }
+}
+  public void settings() {  fullScreen(); }
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "maimai_PatternMaker" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
   }
 }
