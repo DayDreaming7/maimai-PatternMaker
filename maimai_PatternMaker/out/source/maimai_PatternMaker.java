@@ -21,6 +21,7 @@ SoundFile song;
 String songName = "echo";
 
 PrintWriter output;
+String writerPath;
 
 ArrayList <Tap> taps;
 ArrayList <HitPoint> hitPoints;
@@ -61,7 +62,9 @@ public void setup() {
   hitPoints = new ArrayList();
 
   song = new SoundFile(this, songName + ".mp3");
-  output = createWriter("/output/pattern" + year() + month() + day() + hour() + minute() + second());
+
+  writerPath = "output/pattern" + year() + month() + day() + hour() + minute() + second() + ".txt";
+  output = createWriter(writerPath);
 
   initSizeValue();
   psTap = createShape();

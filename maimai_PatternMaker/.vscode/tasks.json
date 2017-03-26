@@ -6,7 +6,7 @@
 	"args": [
         "--force",
 		"--sketch=${workspaceRoot}",
-		"--output=${workspaceRoot}\\out",
+		"--output=${workspaceRoot}//out",
 		"--run"
     ]
 }
