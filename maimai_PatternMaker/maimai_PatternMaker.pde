@@ -1,8 +1,17 @@
-import processing.sound.*;
-SoundFile song;
+//import processing.sound.*;
+import ddf.minim.*;
+import org.multiply.processing.*;
+
+Minim minim;
+AudioPlayer song;
 String songName = "echo";
+float songVolGain = -5.0;
+AudioSample tapSound;
+String tapSoundName = "tap";
+float tapSoundVolGain = 8.0;
 
 PrintWriter output;
+String writerPath;
 
 ArrayList <Tap> taps;
 ArrayList <HitPoint> hitPoints;
@@ -42,8 +51,14 @@ void setup() {
   taps = new ArrayList();
   hitPoints = new ArrayList();
 
-  song = new SoundFile(this, songName + ".mp3");
-  output = createWriter("/output/pattern" + year() + month() + day() + hour() + minute() + second());
+  minim = new Minim(this);
+  song = minim.loadFile(songName + ".mp3");
+  tapSound = minim.loadSample(tapSoundName + ".mp3", 512);
+  song.setGain(songVolGain);
+  tapSound.setGain(tapSoundVolGain);
+
+  writerPath = "output/pattern" + year() + month() + day() + hour() + minute() + second() + ".txt";
+  output = createWriter(writerPath);
 
   initSizeValue();
   psTap = createShape();
@@ -178,10 +193,10 @@ void keyPressed() {
     recording = !recording;
     if (recording) {
       recordingStartTime = millis();
+      song.rewind();
       song.play();
     } else {
-      song.stop();
-      song.cue(0);
+      song.pause();
       output.flush();
       output.close();
     }
@@ -189,34 +204,42 @@ void keyPressed() {
     Tap temp = new Tap(hitPoints.get(0).x, hitPoints.get(0).y, tapDefSpeed, byte(1), 0.5);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "1");
+    tapSound.trigger();
   } else if (key == '+') {
     Tap temp = new Tap(hitPoints.get(1).x, hitPoints.get(1).y, tapDefSpeed, byte(2), 0.5);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "2");
+    tapSound.trigger();
   } else if (key == ENTER) {
     Tap temp = new Tap(hitPoints.get(2).x, hitPoints.get(2).y, tapDefSpeed, byte(3), 0.5);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "3");
+    tapSound.trigger();
   } else if (key == '.') {
     Tap temp = new Tap(hitPoints.get(3).x, hitPoints.get(3).y, tapDefSpeed, byte(4), 0.5);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "4");
+    tapSound.trigger();
   } else if (key == '0') {
     Tap temp = new Tap(hitPoints.get(4).x, hitPoints.get(4).y, tapDefSpeed, byte(5), 0.5);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "5");
+    tapSound.trigger();
   } else if (key == '1') {
     Tap temp = new Tap(hitPoints.get(5).x, hitPoints.get(5).y, tapDefSpeed, byte(6), 0.5);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "6");
+    tapSound.trigger();
   } else if (key == '4') {
     Tap temp = new Tap(hitPoints.get(6).x, hitPoints.get(1).y, tapDefSpeed, byte(7), 0.5);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "7");
+    tapSound.trigger();
   } else if (key == '8') {
     Tap temp = new Tap(hitPoints.get(7).x, hitPoints.get(7).y, tapDefSpeed, byte(8), 0.5);
     taps.add(temp);
     if (recording)output.println((millis() - recordingStartTime) + "/" + "8");
+    tapSound.trigger();
   } else if (key == 'x' || key == 'X') {
     exit();
   }
