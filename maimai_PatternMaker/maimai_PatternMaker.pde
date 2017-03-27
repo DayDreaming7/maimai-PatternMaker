@@ -1,6 +1,7 @@
 //import processing.sound.*;
 import ddf.minim.*;
 import org.multiply.processing.*;
+import lord_of_galaxy.timing_utils.*;
 
 Minim minim;
 AudioPlayer song;
@@ -25,27 +26,34 @@ float tapDefSpeed = 10;
 
 float mainRingOutterR;
 float mainRingInnerR;
-int ringSize = 50;
+int ringThick = 50;
 
 float tapOutterR;
 float tapInnerR;
-int tapSize = 20;
+float tapPointR = 3;
+int tapThick = 20;
+
+float hitPointOutterR = 40;
+float hitPointInnerR = 5;
 
 color bgColor = #5C5D5D;
 color ringColor = #FBFF39;
 color tapColor = #FA5BB3;
+color tapPointColor = #FA5BB3;
+color hitPointOutterColor = #86FFF8;
+color hitPointInnerColor = #F5FF76;
 
 float displayTimeRate = 0.05;
 
+Stopwatch recordTimer;
 boolean recording = false;
-long recordingStartTime;
 
 void setup() {
   fullScreen();
   //size(1200,800);
   orientation(LANDSCAPE);
   noStroke();
-  ellipseMode(CENTER);
+  ellipseMode(RADIUS);
   shapeMode(CENTER);
 
   taps = new ArrayList();
@@ -57,12 +65,14 @@ void setup() {
   song.setGain(songVolGain);
   tapSound.setGain(tapSoundVolGain);
 
+  recordTimer = new Stopwatch(this);
+
   writerPath = "output/pattern" + year() + month() + day() + hour() + minute() + second() + ".txt";
   output = createWriter(writerPath);
 
   initSizeValue();
   psTap = createShape();
-  initAllShape();
+  //initAllShape();
   initHitPoints();
 }
 
@@ -84,21 +94,21 @@ void initSizeValue() {
   centreY = displayHeight/2;
 
   mainRingOutterR = min(displayWidth /20 *10, displayWidth /20 *10) /2;
-  mainRingInnerR = mainRingOutterR - ringSize;
+  mainRingInnerR = mainRingOutterR - ringThick;
 
   tapOutterR = min(displayWidth /20 *1.5, displayWidth /20 *1.5) /2;
-  tapInnerR = tapOutterR - tapSize;
+  tapInnerR = tapOutterR - tapThick;
 }
 
-void initAllShape() {
-  tapOutter = createShape(ELLIPSE, 0, 0, tapOutterR*2, tapOutterR*2);
-  tapOutter.setFill(tapColor);
-  tapInner = createShape(ELLIPSE, 0, 0, tapInnerR*2, tapInnerR*2);
-  tapInner.setFill(bgColor);
-  psTap.addChild(tapOutter);
-  psTap.addChild(tapInner);
-  psTap.setFill(tapColor);
-}
+// void initAllShape() {
+//   tapOutter = createShape(ELLIPSE, 0, 0, tapOutterR*2, tapOutterR*2);
+//   tapOutter.setFill(tapColor);
+//   tapInner = createShape(ELLIPSE, 0, 0, tapInnerR*2, tapInnerR*2);
+//   tapInner.setFill(bgColor);
+//   psTap.addChild(tapOutter);
+//   psTap.addChild(tapInner);
+//   psTap.setFill(tapColor);
+// }
 
 void initHitPoints() {
   for (byte i = 1; i<=8; i++) {
@@ -134,8 +144,8 @@ void initHitPoints() {
       xDirection = -1;
       yDirection = -1;
     }
-    x = centreX + xDirection * (mainRingOutterR - ringSize /2) * sin(radians(alpha));
-    y = centreY + yDirection * (mainRingOutterR - ringSize /2) * cos(radians(alpha));
+    x = centreX + xDirection * (mainRingOutterR - ringThick /2) * sin(radians(alpha));
+    y = centreY + yDirection * (mainRingOutterR - ringThick /2) * cos(radians(alpha));
     HitPoint temp = new HitPoint(x, y);
     hitPoints.add(temp);
   }
@@ -143,9 +153,16 @@ void initHitPoints() {
 
 void drawMainRing() {
   fill(ringColor);
-  ellipse(displayWidth/2, displayHeight/2, mainRingOutterR * 2, mainRingOutterR * 2);
+  ellipse(displayWidth/2, displayHeight/2, mainRingOutterR, mainRingOutterR);
   fill(bgColor);
-  ellipse(displayWidth/2, displayHeight/2, mainRingInnerR * 2, mainRingInnerR * 2);
+  ellipse(displayWidth/2, displayHeight/2, mainRingInnerR, mainRingInnerR);
+
+  for(byte i = 0; i<= hitPoints.size()-1; i++){
+    fill(hitPointOutterColor);
+    ellipse(hitPoints.get(i).x, hitPoints.get(i).y, hitPointOutterR, hitPointOutterR);
+    fill(hitPointInnerColor);
+    ellipse(hitPoints.get(i).x, hitPoints.get(i).y, hitPointInnerR, hitPointInnerR);
+  }
 }
 
 
@@ -174,8 +191,14 @@ class Tap {
   void display() {
     //shape(psTap, x, y);
     if (displayTime > 0) {
-      shape(tapOutter, x, y);
-      shape(tapInner, x, y);
+      // shape(tapOutter, x, y);
+      // shape(tapInner, x, y);
+      fill(tapColor);
+      ellipse(x, y, tapOutterR, tapOutterR);
+      fill(bgColor);
+      ellipse(x, y, tapInnerR, tapInnerR);
+      fill(tapPointColor);
+      ellipse(x, y, tapPointR, tapPointR);
       displayTime -= displayTimeRate;
     }
   }
@@ -192,8 +215,8 @@ void keyPressed() {
   if (key == ' ') {
     recording = !recording;
     if (recording) {
-      recordingStartTime = millis();
       song.rewind();
+      recordTimer.start();
       song.play();
     } else {
       song.pause();
@@ -203,42 +226,42 @@ void keyPressed() {
   } else if (key == '9') {
     Tap temp = new Tap(hitPoints.get(0).x, hitPoints.get(0).y, tapDefSpeed, byte(1), 0.5);
     taps.add(temp);
-    if (recording)output.println((millis() - recordingStartTime) + "/" + "1");
+    if (recording)output.println(recordTimer.time() + "/" + "1");
     tapSound.trigger();
   } else if (key == '+') {
     Tap temp = new Tap(hitPoints.get(1).x, hitPoints.get(1).y, tapDefSpeed, byte(2), 0.5);
     taps.add(temp);
-    if (recording)output.println((millis() - recordingStartTime) + "/" + "2");
+    if (recording)output.println(recordTimer.time() + "/" + "2");
     tapSound.trigger();
   } else if (key == ENTER) {
     Tap temp = new Tap(hitPoints.get(2).x, hitPoints.get(2).y, tapDefSpeed, byte(3), 0.5);
     taps.add(temp);
-    if (recording)output.println((millis() - recordingStartTime) + "/" + "3");
+    if (recording)output.println(recordTimer.time() + "/" + "3");
     tapSound.trigger();
   } else if (key == '.') {
     Tap temp = new Tap(hitPoints.get(3).x, hitPoints.get(3).y, tapDefSpeed, byte(4), 0.5);
     taps.add(temp);
-    if (recording)output.println((millis() - recordingStartTime) + "/" + "4");
+    if (recording)output.println(recordTimer.time() + "/" + "4");
     tapSound.trigger();
   } else if (key == '0') {
     Tap temp = new Tap(hitPoints.get(4).x, hitPoints.get(4).y, tapDefSpeed, byte(5), 0.5);
     taps.add(temp);
-    if (recording)output.println((millis() - recordingStartTime) + "/" + "5");
+    if (recording)output.println(recordTimer.time() + "/" + "5");
     tapSound.trigger();
   } else if (key == '1') {
     Tap temp = new Tap(hitPoints.get(5).x, hitPoints.get(5).y, tapDefSpeed, byte(6), 0.5);
     taps.add(temp);
-    if (recording)output.println((millis() - recordingStartTime) + "/" + "6");
+    if (recording)output.println(recordTimer.time() + "/" + "6");
     tapSound.trigger();
   } else if (key == '4') {
     Tap temp = new Tap(hitPoints.get(6).x, hitPoints.get(1).y, tapDefSpeed, byte(7), 0.5);
     taps.add(temp);
-    if (recording)output.println((millis() - recordingStartTime) + "/" + "7");
+    if (recording)output.println(recordTimer.time() + "/" + "7");
     tapSound.trigger();
   } else if (key == '8') {
     Tap temp = new Tap(hitPoints.get(7).x, hitPoints.get(7).y, tapDefSpeed, byte(8), 0.5);
     taps.add(temp);
-    if (recording)output.println((millis() - recordingStartTime) + "/" + "8");
+    if (recording)output.println(recordTimer.time() + "/" + "8");
     tapSound.trigger();
   } else if (key == 'x' || key == 'X') {
     exit();
