@@ -3,6 +3,7 @@ import ddf.minim.*;
 import org.multiply.processing.*;
 import lord_of_galaxy.timing_utils.*;
 
+//Sounds
 Minim minim;
 AudioPlayer song;
 String songName = "echo";
@@ -11,17 +12,21 @@ AudioSample tapSound;
 String tapSoundName = "tap";
 float tapSoundVolGain = 8.0;
 
+//Output file
 PrintWriter output;
 String writerPath;
 
+//ArrayLists
 ArrayList <Tap> taps;
 ArrayList <HitPoint> hitPoints;
 
+//Shapes
 PShape psTap;
 PShape tapOutter;
 PShape tapInner;
 PShape tapPoint;
 
+//Sizes of mainRing
 float centreX, centreY;
 float tapDefSpeed = 10;
 
@@ -29,14 +34,16 @@ float mainRingOutterR;
 float mainRingInnerR;
 int ringThick = 50;
 
+//Sizes of tabs
 float tapOutterR;
 float tapInnerR;
 float tapPointR = 3;
 int tapThick = 20;
 
-float hitPointOutterR = 40;
+float hitPointOutterR = 30;
 float hitPointInnerR = 5;
 
+//Colors
 color bgColor = #5C5D5D;
 color ringColor = #FBFF39;
 color tapColor = #FA5BB3;
@@ -44,18 +51,19 @@ color tapPointColor = #FA5BB3;
 color hitPointOutterColor = #86FFF8;
 color hitPointInnerColor = #F5FF76;
 
+//Tab displayTime
 float displayTimeRate = 0.05;
 
+//Recording
 Stopwatch recordTimer;
 boolean recording = false;
-
+//----------------------------------------------------------------------------
 void setup() {
   fullScreen();
   //size(1200,800);
   orientation(LANDSCAPE);
   noStroke();
   ellipseMode(RADIUS);
-
   shapeMode(CENTER);
 
   taps = new ArrayList();
@@ -69,19 +77,15 @@ void setup() {
 
   recordTimer = new Stopwatch(this);
 
-  writerPath = "output/pattern" + year() + month() + day() + hour() + minute() + second() + ".txt";
+  writerPath = "output/pattern" + year() + nf(month(), 2) + nf(day(), 2) + "-" + nf(hour(), 2) + nf(minute(),2) + nf(second(),2) + ".txt";
   output = createWriter(writerPath);
 
-  initSizeValue();
-  psTap = createShape(GROUP);
-  initAllShape();
-  initHitPoints();
+  initializeAll(); //Size, Shapes, HitPoints of mainRing
 }
 
 void draw() {
   background(bgColor);
-  drawMainRing();
-  displayAll();
+  update();
 
   if (recording) {
     fill(#1FFF49);
@@ -89,147 +93,6 @@ void draw() {
     fill(#FC3B4B);
   }
   rect(10, 10, 20, 20);
-}
-
-void initSizeValue() {
-  centreX = displayWidth/2;
-  centreY = displayHeight/2;
-
-  mainRingOutterR = min(displayWidth /20 *10, displayWidth /20 *10) /2;
-  mainRingInnerR = mainRingOutterR - ringThick;
-
-  tapOutterR = min(displayWidth /20 *1.5, displayWidth /20 *1.5) /2;
-  tapInnerR = tapOutterR - tapThick;
-}
-
-void initAllShape() {
-  tapOutter = createShape(ELLIPSE, 0, 0, tapOutterR, tapOutterR);
-  tapOutter.setFill(tapColor);
-  tapInner = createShape(ELLIPSE, 0, 0, tapInnerR, tapInnerR);
-  tapInner.setFill(bgColor);
-  tapPoint = createShape(ELLIPSE, 0, 0, tapPointR, tapPointR);
-  tapPoint.setFill(tapPointColor);
-
-  psTap.addChild(tapOutter);
-  psTap.addChild(tapInner);
-  psTap.addChild(tapPoint);
-}
-
-void initHitPoints() {
-  for (byte i = 1; i<=8; i++) {
-    float x, y;
-    float alpha = 0;
-    int xDirection = 1;
-    int yDirection = 1;
-    switch(i) {   
-    case 1:
-    case 4:
-    case 5:
-    case 8:
-      alpha = 22.5;
-      break;
-    case 2:
-    case 3:
-    case 6:
-    case 7:
-      alpha = 67.5;
-      break;
-    }
-    switch(i) {    
-    case 5:
-    case 6:
-      xDirection = -1;
-      break;
-    case 1:
-    case 2:
-      yDirection = -1;
-      break;
-    case 7:
-    case 8:
-      xDirection = -1;
-      yDirection = -1;
-    }
-    x = centreX + xDirection * (mainRingOutterR - ringThick /2) * sin(radians(alpha));
-    y = centreY + yDirection * (mainRingOutterR - ringThick /2) * cos(radians(alpha));
-    HitPoint temp = new HitPoint(x, y);
-    hitPoints.add(temp);
-  }
-}
-
-void drawMainRing() {
-  fill(ringColor);
-  ellipse(displayWidth/2, displayHeight/2, mainRingOutterR, mainRingOutterR);
-  fill(bgColor);
-  ellipse(displayWidth/2, displayHeight/2, mainRingInnerR, mainRingInnerR);
-
-  // for(byte i = 0; i<= hitPoints.size()-1; i++){
-  //   HitPoint.display(i);
-  // }
-  for(HitPoint temp:hitPoints){
-    temp.display();
-  }
-}
-
-
-class HitPoint {
-  float x, y;
-  HitPoint(float tx, float ty) {
-    x = tx;
-    y = ty;
-  }
-
-  void display(){
-    fill(hitPointOutterColor);
-    //ellipse(hitPoints.get(i).x, hitPoints.get(i).y, hitPointOutterR, hitPointOutterR);
-    ellipse(x, y, hitPointOutterR, hitPointOutterR);
-    fill(hitPointInnerColor);
-    //ellipse(hitPoints.get(i).x, hitPoints.get(i).y, hitPointInnerR, hitPointInnerR);
-    ellipse(x, y, hitPointInnerR, hitPointInnerR);
-  }
-}
-
-class Tap {
-  float x, y;
-  float speed;
-  byte pos;
-  float displayTime;
-
-  Tap(float tx, float ty, float ts, byte tp, float tdp) {
-    x = tx;
-    y = ty;
-    speed = ts;
-    pos = tp;
-    displayTime = tdp;
-  }
-
-  void display() {
-    //shape(psTap, x, y);
-    if (displayTime > 0) {
-      shape(psTap, x, y);
-
-      //setFill(tapColor);
-      //shape(tapOutter, x, y);
-      //setFill(bgColor);
-      //shape(tapInner, x, y);
-      //etFill(tapPointColor);
-      //shape(tapP)
-
-      // fill(tapColor);
-      // ellipse(x, y, tapOutterR, tapOutterR);
-      // fill(bgColor);
-      // ellipse(x, y, tapInnerR, tapInnerR);
-      // fill(tapPointColor);
-      // ellipse(x, y, tapPointR, tapPointR);
-      displayTime -= displayTimeRate;
-    }
-  }
-}
-
-
-void displayAll() {
-  for (Tap temp : taps) {
-    temp.display();
-  }
 }
 
 void keyPressed() {
