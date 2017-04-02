@@ -20,6 +20,7 @@ ArrayList <HitPoint> hitPoints;
 PShape psTap;
 PShape tapOutter;
 PShape tapInner;
+PShape tapPoint;
 
 float centreX, centreY;
 float tapDefSpeed = 10;
@@ -72,8 +73,8 @@ void setup() {
   output = createWriter(writerPath);
 
   initSizeValue();
-  psTap = createShape();
-  //initAllShape();
+  psTap = createShape(GROUP);
+  initAllShape();
   initHitPoints();
 }
 
@@ -101,15 +102,18 @@ void initSizeValue() {
   tapInnerR = tapOutterR - tapThick;
 }
 
-// void initAllShape() {
-//   tapOutter = createShape(ELLIPSE, 0, 0, tapOutterR*2, tapOutterR*2);
-//   tapOutter.setFill(tapColor);
-//   tapInner = createShape(ELLIPSE, 0, 0, tapInnerR*2, tapInnerR*2);
-//   tapInner.setFill(bgColor);
-//   psTap.addChild(tapOutter);
-//   psTap.addChild(tapInner);
-//   psTap.setFill(tapColor);
-// }
+void initAllShape() {
+  tapOutter = createShape(ELLIPSE, 0, 0, tapOutterR, tapOutterR);
+  tapOutter.setFill(tapColor);
+  tapInner = createShape(ELLIPSE, 0, 0, tapInnerR, tapInnerR);
+  tapInner.setFill(bgColor);
+  tapPoint = createShape(ELLIPSE, 0, 0, tapPointR, tapPointR);
+  tapPoint.setFill(tapPointColor);
+
+  psTap.addChild(tapOutter);
+  psTap.addChild(tapInner);
+  psTap.addChild(tapPoint);
+}
 
 void initHitPoints() {
   for (byte i = 1; i<=8; i++) {
@@ -158,11 +162,11 @@ void drawMainRing() {
   fill(bgColor);
   ellipse(displayWidth/2, displayHeight/2, mainRingInnerR, mainRingInnerR);
 
-  for(byte i = 0; i<= hitPoints.size()-1; i++){
-    fill(hitPointOutterColor);
-    ellipse(hitPoints.get(i).x, hitPoints.get(i).y, hitPointOutterR, hitPointOutterR);
-    fill(hitPointInnerColor);
-    ellipse(hitPoints.get(i).x, hitPoints.get(i).y, hitPointInnerR, hitPointInnerR);
+  // for(byte i = 0; i<= hitPoints.size()-1; i++){
+  //   HitPoint.display(i);
+  // }
+  for(HitPoint temp:hitPoints){
+    temp.display();
   }
 }
 
@@ -172,6 +176,15 @@ class HitPoint {
   HitPoint(float tx, float ty) {
     x = tx;
     y = ty;
+  }
+
+  void display(){
+    fill(hitPointOutterColor);
+    //ellipse(hitPoints.get(i).x, hitPoints.get(i).y, hitPointOutterR, hitPointOutterR);
+    ellipse(x, y, hitPointOutterR, hitPointOutterR);
+    fill(hitPointInnerColor);
+    //ellipse(hitPoints.get(i).x, hitPoints.get(i).y, hitPointInnerR, hitPointInnerR);
+    ellipse(x, y, hitPointInnerR, hitPointInnerR);
   }
 }
 
@@ -192,14 +205,21 @@ class Tap {
   void display() {
     //shape(psTap, x, y);
     if (displayTime > 0) {
-      // shape(tapOutter, x, y);
-      // shape(tapInner, x, y);
-      fill(tapColor);
-      ellipse(x, y, tapOutterR, tapOutterR);
-      fill(bgColor);
-      ellipse(x, y, tapInnerR, tapInnerR);
-      fill(tapPointColor);
-      ellipse(x, y, tapPointR, tapPointR);
+      shape(psTap, x, y);
+
+      //setFill(tapColor);
+      //shape(tapOutter, x, y);
+      //setFill(bgColor);
+      //shape(tapInner, x, y);
+      //etFill(tapPointColor);
+      //shape(tapP)
+
+      // fill(tapColor);
+      // ellipse(x, y, tapOutterR, tapOutterR);
+      // fill(bgColor);
+      // ellipse(x, y, tapInnerR, tapInnerR);
+      // fill(tapPointColor);
+      // ellipse(x, y, tapPointR, tapPointR);
       displayTime -= displayTimeRate;
     }
   }
