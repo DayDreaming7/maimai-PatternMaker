@@ -2,11 +2,11 @@
 	"version": "0.1.0",
 	"command": "processing-java",
 	"isShellCommand": true,
-	"showOutput": "never",
+	//"showOutput": "never",
 	"args": [
         "--force",
 		"--sketch=${workspaceRoot}",
-		"--output=${workspaceRoot}\\out",
+		"--output=${workspaceRoot}//out",
 		"--run"
     ]
 }
