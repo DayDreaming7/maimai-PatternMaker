@@ -107,42 +107,42 @@ void keyPressed() {
       output.flush();
       output.close();
     }
-  } else if (key == ';') {
+  } else if (key == '9') {
     Tap temp = new Tap(hitPoints.get(0).x, hitPoints.get(0).y, tapDefSpeed, byte(1), 0.5);
     taps.add(temp);
     if (recording)output.println(recordTimer.time() + "/" + "1");
     tapSound.trigger();
-  } else if (key == '\'') {
+  } else if (key == 'o'|| key == 'O') {
     Tap temp = new Tap(hitPoints.get(1).x, hitPoints.get(1).y, tapDefSpeed, byte(2), 0.5);
     taps.add(temp);
     if (recording)output.println(recordTimer.time() + "/" + "2");
     tapSound.trigger();
-  } else if (key == '/') {
+  } else if (key == 'l'|| key == 'L') {
     Tap temp = new Tap(hitPoints.get(2).x, hitPoints.get(2).y, tapDefSpeed, byte(3), 0.5);
     taps.add(temp);
     if (recording)output.println(recordTimer.time() + "/" + "3");
     tapSound.trigger();
-  } else if (key == '.') {
+  } else if (key == ',') {
     Tap temp = new Tap(hitPoints.get(3).x, hitPoints.get(3).y, tapDefSpeed, byte(4), 0.5);
     taps.add(temp);
     if (recording)output.println(recordTimer.time() + "/" + "4");
     tapSound.trigger();
-  } else if (key == ',') {
+  } else if (key == 'm'|| key == 'M') {
     Tap temp = new Tap(hitPoints.get(4).x, hitPoints.get(4).y, tapDefSpeed, byte(5), 0.5);
     taps.add(temp);
     if (recording)output.println(recordTimer.time() + "/" + "5");
     tapSound.trigger();
-  } else if (key == 'm' || key == 'M') {
+  } else if (key == 'j' || key == 'J') {
     Tap temp = new Tap(hitPoints.get(5).x, hitPoints.get(5).y, tapDefSpeed, byte(6), 0.5);
     taps.add(temp);
     if (recording)output.println(recordTimer.time() + "/" + "6");
     tapSound.trigger();
-  } else if (key == 'k' || key == 'K') {
+  } else if (key == 'u' || key == 'U') {
     Tap temp = new Tap(hitPoints.get(6).x, hitPoints.get(1).y, tapDefSpeed, byte(7), 0.5);
     taps.add(temp);
     if (recording)output.println(recordTimer.time() + "/" + "7");
     tapSound.trigger();
-  } else if (key == 'l' || key == 'L') {
+  } else if (key == '8') {
     Tap temp = new Tap(hitPoints.get(7).x, hitPoints.get(7).y, tapDefSpeed, byte(8), 0.5);
     taps.add(temp);
     if (recording)output.println(recordTimer.time() + "/" + "8");
